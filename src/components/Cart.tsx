@@ -1,0 +1,66 @@
+import useGameContext from "../context/contextHook"
+import { IoMdCloseCircle } from "react-icons/io";
+import { Link } from "react-router-dom";
+
+export default function Cart() {
+    const { cart, removeFromCart, clearCart } = useGameContext(); 
+    return (
+        <div className="font-montserrat w-full h-full flex flex-col gap-2 text-white py-4 px-2">
+            <div className="flex justify-between">
+                <h3 className="text-lg font-bold">{cart.length} jogos</h3>
+                <button 
+                    onClick={() => clearCart()}
+                    className="text-white text-opacity-60 text-sm font-bold">
+                    Limpar
+                </button>
+            </div>
+            <div className="flex-1 py-4 space-y-1 overflow-auto scroll-content">
+                {cart.map(game => {
+                    return (
+                        <Link
+                            to={`/shop/game/${game.id}`} 
+                            state={{game: game}}
+                            key={game.id}
+                            className="rounded-lg relative w-full min-h-20 bg-black bg-opacity-40 px-2 py-[6px] flex gap-2 items-center">
+                            <div
+                                style={{
+                                    backgroundImage: `url(${game.background_image})`,
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    height: '74px',
+                                    width: '52px',
+                                    borderRadius: '2px',
+                                }}>
+                            </div>
+                            <div className="flex-1 h-full flex flex-col justify-center">
+                                <h4 className="font-bold text-[13px]">{game.name}</h4>
+                                <div className="text-xs">{game.price}</div>
+                            </div>
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    removeFromCart(game.id)}} 
+                                className="absolute z-10 top-1 right-1">
+                                <IoMdCloseCircle className=" w-4 h-4 text-white"/>
+                            </button>
+                        </Link>
+                    )
+                })}
+            </div>
+            <div className="flex items-center justify-between">
+                <span className="text-white text-opacity-60 text-sm font-bold">Total:</span> 
+                    <span className="font-bold ">
+                        R$ {cart.reduce((sum, game) => {
+                            if (game.price) {
+                                const numeric = game.price.replace(/[^\d,]/g, "").replace(",", ".");
+                                return sum + Number(numeric);
+                            }
+                            return sum;
+                        }, 0).toFixed(2).replace(".", ",")}
+                    </span>
+            </div>
+
+        </div>
+    )
+
+}
